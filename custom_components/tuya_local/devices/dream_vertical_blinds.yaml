@@ -1,0 +1,93 @@
+name: Vertical blinds
+products:
+  - id: wzre8hu2
+    manufacturer: Dream
+    model: Unislat blinds motor
+entities:
+  - entity: cover
+    class: curtain
+    dps:
+      - id: 1
+        type: string
+        name: control
+        optional: true
+        mapping:
+          - dps_val: open
+            value: open
+          - dps_val: close
+            value: close
+          - dps_val: stop
+            value: stop
+      # Target traverse position. Cloud/HA closed (0) is raw 100.
+      - id: 2
+        type: integer
+        name: position
+        optional: true
+        range:
+          min: 0
+          max: 100
+        mapping:
+          - invert: true
+      - id: 3
+        type: integer
+        name: current_position
+        range:
+          min: 0
+          max: 100
+        mapping:
+          - invert: true
+      # Observed stale/unreliable on this motor; expose as attribute only.
+      - id: 7
+        type: string
+        name: work_state
+        optional: true
+      # Vane angle is discrete on Unislat: only Privacy and Daylight are safe.
+      # Continuous intermediate angles are not a supported product mode and can
+      # damage the mechanism if forced.
+      # raw 180 -> HA tilt 0 (Privacy)
+      # raw 90  -> HA tilt 50 (Daylight)
+      - id: 21
+        type: integer
+        name: tilt_position
+        mapping:
+          - dps_val: 180
+            value: 0
+          - dps_val: 90
+            value: 50
+  - entity: sensor
+    name: Last operation duration
+    class: duration
+    category: diagnostic
+    dps:
+      - id: 10
+        type: integer
+        name: sensor
+        optional: true
+        unit: ms
+  - entity: binary_sensor
+    class: problem
+    category: diagnostic
+    dps:
+      - id: 12
+        type: bitfield
+        name: sensor
+        optional: true
+        mapping:
+          - dps_val: 0
+            value: false
+          - dps_val: null
+            value: false
+          - value: true
+      - id: 12
+        type: bitfield
+        name: fault_code
+        optional: true
+  - entity: sensor
+    name: Pause state
+    category: diagnostic
+    hidden: true
+    dps:
+      - id: 20
+        type: string
+        name: sensor
+        optional: true
